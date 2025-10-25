@@ -26,10 +26,13 @@ const RestaurantsAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRestaurant, setEditingRestaurant] = useState<Restaurant | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
     description: "",
+    logo_url: "",
+    banner_image_url: "",
     theme_color: "#FF6B35",
     background_color: "#FFF5F0",
     contact_phone: "",
@@ -92,6 +95,8 @@ const RestaurantsAdmin = () => {
       name: restaurant.name,
       slug: restaurant.slug,
       description: restaurant.description || "",
+      logo_url: (restaurant as any).logo_url || "",
+      banner_image_url: (restaurant as any).banner_image_url || "",
       theme_color: restaurant.theme_color,
       background_color: restaurant.background_color,
       contact_phone: restaurant.contact_phone || "",
@@ -117,12 +122,52 @@ const RestaurantsAdmin = () => {
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'banner_image_url') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5MB");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${field}-${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('menu-images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('menu-images')
+        .getPublicUrl(fileName);
+
+      setFormData({ ...formData, [field]: publicUrl });
+      toast.success("Image uploaded successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const resetForm = () => {
     setEditingRestaurant(null);
     setFormData({
       name: "",
       slug: "",
       description: "",
+      logo_url: "",
+      banner_image_url: "",
       theme_color: "#FF6B35",
       background_color: "#FFF5F0",
       contact_phone: "",
@@ -176,6 +221,78 @@ const RestaurantsAdmin = () => {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="logo_url">Restaurant Logo</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="logo_url"
+                    type="url"
+                    value={formData.logo_url}
+                    onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+                    placeholder="https://example.com/logo.jpg"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('logo-upload')?.click()}
+                    disabled={uploading}
+                  >
+                    {uploading ? "Uploading..." : "Browse"}
+                  </Button>
+                </div>
+                <Input
+                  id="logo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, 'logo_url')}
+                  className="hidden"
+                />
+                {formData.logo_url && (
+                  <img 
+                    src={formData.logo_url} 
+                    alt="Logo preview" 
+                    className="w-24 h-24 object-cover rounded-full border-2"
+                  />
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="banner_image_url">Banner Image</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="banner_image_url"
+                    type="url"
+                    value={formData.banner_image_url}
+                    onChange={(e) => setFormData({ ...formData, banner_image_url: e.target.value })}
+                    placeholder="https://example.com/banner.jpg"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('banner-upload')?.click()}
+                    disabled={uploading}
+                  >
+                    {uploading ? "Uploading..." : "Browse"}
+                  </Button>
+                </div>
+                <Input
+                  id="banner-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, 'banner_image_url')}
+                  className="hidden"
+                />
+                {formData.banner_image_url && (
+                  <img 
+                    src={formData.banner_image_url} 
+                    alt="Banner preview" 
+                    className="w-full h-32 object-cover rounded-md"
+                  />
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">

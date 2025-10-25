@@ -6,9 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ChefHat, Leaf, Flame, Menu as MenuIcon, Phone, MapPin } from "lucide-react";
+import { ChefHat, Leaf, Flame, Menu as MenuIcon, Phone, MapPin, X, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface Restaurant {
   id: string;
@@ -48,6 +49,8 @@ const RestaurantMenu = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>("");
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     if (slug) {
@@ -274,7 +277,14 @@ const RestaurantMenu = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {items.map(item => (
-                      <Card key={item.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                      <Card 
+                        key={item.id} 
+                        className="overflow-hidden hover:shadow-lg transition-all cursor-pointer transform hover:scale-[1.02]"
+                        onClick={() => {
+                          setSelectedItem(item);
+                          setQuantity(1);
+                        }}
+                      >
                         <CardContent className="p-0">
                           <div className="flex gap-4 p-4">
                             {item.image_url && (
@@ -291,7 +301,7 @@ const RestaurantMenu = () => {
                                   className="font-bold text-lg whitespace-nowrap"
                                   style={{ color: restaurant.theme_color }}
                                 >
-                                  ${item.price.toFixed(2)}
+                                  ₹{item.price.toFixed(2)}
                                 </span>
                               </div>
                               {item.description && (
@@ -339,6 +349,104 @@ const RestaurantMenu = () => {
           </div>
         </div>
       </div>
+
+      {/* Dish Detail Dialog */}
+      <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
+        <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden">
+          {selectedItem && (
+            <div className="relative">
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedItem(null)}
+                className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              {/* Image */}
+              {selectedItem.image_url && (
+                <div className="relative h-64 md:h-80 overflow-hidden">
+                  <img
+                    src={selectedItem.image_url}
+                    alt={selectedItem.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+
+              {/* Content */}
+              <div className="p-6 space-y-4">
+                {/* Dietary Badges */}
+                <div className="flex flex-wrap gap-2">
+                  {selectedItem.is_vegetarian && (
+                    <Badge variant="secondary">
+                      <Leaf className="h-3 w-3 mr-1" />
+                      Vegetarian
+                    </Badge>
+                  )}
+                  {selectedItem.is_vegan && (
+                    <Badge variant="secondary">
+                      <Leaf className="h-3 w-3 mr-1" />
+                      Vegan
+                    </Badge>
+                  )}
+                  {selectedItem.is_spicy && (
+                    <Badge variant="destructive">
+                      <Flame className="h-3 w-3 mr-1" />
+                      Spicy
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Name */}
+                <h2 className="text-2xl md:text-3xl font-bold">{selectedItem.name}</h2>
+
+                {/* Description */}
+                {selectedItem.description && (
+                  <p className="text-muted-foreground leading-relaxed">
+                    {selectedItem.description}
+                  </p>
+                )}
+
+                {/* Quantity Selector & Add to Cart */}
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <div className="flex items-center gap-3 border rounded-lg p-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="text-lg font-semibold w-8 text-center">{quantity}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <Button
+                    size="lg"
+                    className="text-white font-semibold"
+                    style={{ backgroundColor: restaurant.theme_color }}
+                    onClick={() => {
+                      toast.success(`Added ${quantity}x ${selectedItem.name} to cart`);
+                      setSelectedItem(null);
+                    }}
+                  >
+                    Add item ₹{(selectedItem.price * quantity).toFixed(2)}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

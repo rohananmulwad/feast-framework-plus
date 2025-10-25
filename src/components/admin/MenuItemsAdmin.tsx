@@ -320,7 +320,7 @@ const MenuItemsAdmin = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="price">Price *</Label>
+                  <Label htmlFor="price">Price (₹) *</Label>
                   <Input
                     id="price"
                     type="number"
@@ -328,6 +328,7 @@ const MenuItemsAdmin = () => {
                     min="0"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    placeholder="299.00"
                     required
                   />
                 </div>
