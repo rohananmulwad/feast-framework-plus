@@ -6,10 +6,23 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ChefHat, Leaf, Flame, Menu as MenuIcon, Phone, MapPin, X, Minus, Plus } from "lucide-react";
+import { ChefHat, Flame, Menu as MenuIcon, Phone, MapPin, X, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+
+// Veg and Non-Veg Icon Components
+const VegIcon = ({ className = "" }: { className?: string }) => (
+  <div className={`inline-flex items-center justify-center w-5 h-5 border-2 border-green-600 ${className}`}>
+    <div className="w-2 h-2 rounded-full bg-green-600" />
+  </div>
+);
+
+const NonVegIcon = ({ className = "" }: { className?: string }) => (
+  <div className={`inline-flex items-center justify-center w-5 h-5 border-2 border-red-600 ${className}`}>
+    <div className="w-2 h-2 rounded-full bg-red-600" />
+  </div>
+);
 
 interface Restaurant {
   id: string;
@@ -51,6 +64,7 @@ const RestaurantMenu = () => {
   const [activeCategory, setActiveCategory] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [dietFilter, setDietFilter] = useState<"all" | "veg" | "non-veg">("all");
 
   useEffect(() => {
     if (slug) {
@@ -115,7 +129,16 @@ const RestaurantMenu = () => {
   };
 
   const getCategoryItems = (categoryId: string) => {
-    return menuItems.filter(item => item.category_id === categoryId);
+    return menuItems.filter(item => {
+      if (item.category_id !== categoryId) return false;
+      
+      if (dietFilter === "veg") {
+        return item.is_vegetarian || item.is_vegan;
+      } else if (dietFilter === "non-veg") {
+        return !item.is_vegetarian && !item.is_vegan;
+      }
+      return true;
+    });
   };
 
   if (loading) {
@@ -212,22 +235,58 @@ const RestaurantMenu = () => {
         </div>
       </div>
 
-      {/* Contact Info Bar */}
-      <div className="border-b bg-card">
+      {/* Contact Info Bar with Filters */}
+      <div className="border-b bg-card sticky top-0 z-40 shadow-sm">
         <div className="container max-w-7xl mx-auto px-4 py-4">
-          <div className="flex flex-wrap gap-4 text-sm">
-            {restaurant.address && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <MapPin className="h-4 w-4" />
-                <span>{restaurant.address}</span>
-              </div>
-            )}
-            {restaurant.contact_phone && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="h-4 w-4" />
-                <span>{restaurant.contact_phone}</span>
-              </div>
-            )}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Contact Info */}
+            <div className="flex flex-wrap gap-4 text-sm">
+              {restaurant.address && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin className="h-4 w-4" />
+                  <span>{restaurant.address}</span>
+                </div>
+              )}
+              {restaurant.contact_phone && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Phone className="h-4 w-4" />
+                  <span>{restaurant.contact_phone}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Diet Filters */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium mr-2">Filter:</span>
+              <Button
+                variant={dietFilter === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDietFilter("all")}
+                className="h-8"
+              >
+                All
+              </Button>
+              <Button
+                variant={dietFilter === "veg" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDietFilter("veg")}
+                className="h-8 gap-2"
+                style={dietFilter === "veg" ? { backgroundColor: "#16a34a" } : {}}
+              >
+                <VegIcon />
+                Veg
+              </Button>
+              <Button
+                variant={dietFilter === "non-veg" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDietFilter("non-veg")}
+                className="h-8 gap-2"
+                style={dietFilter === "non-veg" ? { backgroundColor: "#dc2626" } : {}}
+              >
+                <NonVegIcon />
+                Non-Veg
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -295,8 +354,15 @@ const RestaurantMenu = () => {
                               />
                             )}
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-2 mb-2">
-                                <h3 className="font-semibold text-lg">{item.name}</h3>
+                              <div className="flex items-start gap-2 mb-2">
+                                <div className="flex items-center gap-2 flex-1">
+                                  {(item.is_vegetarian || item.is_vegan) ? (
+                                    <VegIcon />
+                                  ) : (
+                                    <NonVegIcon />
+                                  )}
+                                  <h3 className="font-semibold text-lg">{item.name}</h3>
+                                </div>
                                 <span
                                   className="font-bold text-lg whitespace-nowrap"
                                   style={{ color: restaurant.theme_color }}
@@ -310,18 +376,6 @@ const RestaurantMenu = () => {
                                 </p>
                               )}
                               <div className="flex flex-wrap gap-2">
-                                {item.is_vegetarian && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    <Leaf className="h-3 w-3 mr-1" />
-                                    Vegetarian
-                                  </Badge>
-                                )}
-                                {item.is_vegan && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    <Leaf className="h-3 w-3 mr-1" />
-                                    Vegan
-                                  </Badge>
-                                )}
                                 {item.is_spicy && (
                                   <Badge variant="destructive" className="text-xs">
                                     <Flame className="h-3 w-3 mr-1" />
@@ -376,30 +430,23 @@ const RestaurantMenu = () => {
 
               {/* Content */}
               <div className="p-6 space-y-4">
-                {/* Dietary Badges */}
-                <div className="flex flex-wrap gap-2">
-                  {selectedItem.is_vegetarian && (
-                    <Badge variant="secondary">
-                      <Leaf className="h-3 w-3 mr-1" />
-                      Vegetarian
-                    </Badge>
+                {/* Name with Diet Icon */}
+                <div className="flex items-start gap-3">
+                  {(selectedItem.is_vegetarian || selectedItem.is_vegan) ? (
+                    <VegIcon className="mt-1" />
+                  ) : (
+                    <NonVegIcon className="mt-1" />
                   )}
-                  {selectedItem.is_vegan && (
-                    <Badge variant="secondary">
-                      <Leaf className="h-3 w-3 mr-1" />
-                      Vegan
-                    </Badge>
-                  )}
-                  {selectedItem.is_spicy && (
-                    <Badge variant="destructive">
-                      <Flame className="h-3 w-3 mr-1" />
-                      Spicy
-                    </Badge>
-                  )}
+                  <h2 className="text-2xl md:text-3xl font-bold flex-1">{selectedItem.name}</h2>
                 </div>
 
-                {/* Name */}
-                <h2 className="text-2xl md:text-3xl font-bold">{selectedItem.name}</h2>
+                {/* Dietary Badges */}
+                {selectedItem.is_spicy && (
+                  <Badge variant="destructive">
+                    <Flame className="h-3 w-3 mr-1" />
+                    Spicy
+                  </Badge>
+                )}
 
                 {/* Description */}
                 {selectedItem.description && (
