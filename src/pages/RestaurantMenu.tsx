@@ -455,40 +455,6 @@ const RestaurantMenu = () => {
                   </p>
                 )}
 
-                {/* Quantity Selector & Add to Cart */}
-                <div className="flex items-center justify-between pt-4 border-t">
-                  <div className="flex items-center gap-3 border rounded-lg p-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="text-lg font-semibold w-8 text-center">{quantity}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <Button
-                    size="lg"
-                    className="text-white font-semibold"
-                    style={{ backgroundColor: restaurant.theme_color }}
-                    onClick={() => {
-                      toast.success(`Added ${quantity}x ${selectedItem.name} to cart`);
-                      setSelectedItem(null);
-                    }}
-                  >
-                    Add item ₹{(selectedItem.price * quantity).toFixed(2)}
-                  </Button>
-                </div>
               </div>
             </div>
           )}
