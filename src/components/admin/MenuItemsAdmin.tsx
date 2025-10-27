@@ -386,7 +386,7 @@ const MenuItemsAdmin = () => {
                       id="is_vegetarian"
                       checked={formData.is_vegetarian}
                       onCheckedChange={(checked) => 
-                        setFormData({ ...formData, is_vegetarian: checked as boolean })
+                        setFormData({ ...formData, is_vegetarian: checked as boolean, is_vegan: false })
                       }
                     />
                     <label htmlFor="is_vegetarian" className="text-sm cursor-pointer">
@@ -398,11 +398,25 @@ const MenuItemsAdmin = () => {
                       id="is_vegan"
                       checked={formData.is_vegan}
                       onCheckedChange={(checked) => 
-                        setFormData({ ...formData, is_vegan: checked as boolean })
+                        setFormData({ ...formData, is_vegan: checked as boolean, is_vegetarian: false })
                       }
                     />
                     <label htmlFor="is_vegan" className="text-sm cursor-pointer">
                       Vegan
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="is_nonveg"
+                      checked={!formData.is_vegetarian && !formData.is_vegan}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setFormData({ ...formData, is_vegetarian: false, is_vegan: false })
+                        }
+                      }}
+                    />
+                    <label htmlFor="is_nonveg" className="text-sm cursor-pointer">
+                      Non-Veg
                     </label>
                   </div>
                   <div className="flex items-center space-x-2">
