@@ -63,10 +63,10 @@ const Restaurants = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-primary/10 via-accent/5 to-background border-b">
+      <div className="bg-gradient-to-br from-primary/10 via-accent/5 to-background border-b animate-fade-in">
         <div className="container py-16 max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
-            <ChefHat className="h-10 w-10 text-primary" />
+            <ChefHat className="h-10 w-10 text-primary animate-scale-in" />
             <h1 className="text-5xl font-bold text-foreground">Tasty Menus</h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl">
@@ -87,15 +87,20 @@ const Restaurants = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {restaurants.map((restaurant) => (
-              <Link key={restaurant.id} to={`/menu/${restaurant.slug}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] h-full">
+            {restaurants.map((restaurant, index) => (
+              <Link 
+                key={restaurant.id} 
+                to={`/menu/${restaurant.slug}`}
+                className="animate-slide-up"
+                style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+              >
+                <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1 h-full group">
                   {restaurant.banner_image_url ? (
                     <div className="h-48 overflow-hidden">
                       <img
                         src={restaurant.banner_image_url}
                         alt={restaurant.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                     </div>
                   ) : (
@@ -139,7 +144,7 @@ const Restaurants = () => {
                       </div>
                     )}
                     <Button 
-                      className="w-full mt-4"
+                      className="w-full mt-4 transition-all duration-300 hover:shadow-lg"
                       style={{ backgroundColor: restaurant.theme_color }}
                     >
                       View Menu

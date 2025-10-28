@@ -214,18 +214,18 @@ const RestaurantMenu = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
         {/* Restaurant Info Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+        <div className="absolute bottom-0 left-0 right-0 p-6 text-white animate-slide-up">
           <div className="container max-w-7xl mx-auto">
             <div className="flex items-end gap-4">
               {restaurant.logo_url && (
                 <img
                   src={restaurant.logo_url}
                   alt=""
-                  className="h-20 w-20 rounded-full border-4 border-white shadow-lg object-cover"
+                  className="h-20 w-20 rounded-full border-4 border-white shadow-lg object-cover transition-transform duration-300 hover:scale-110"
                 />
               )}
               <div>
-                <h1 className="text-4xl md:text-5xl font-bold mb-2">{restaurant.name}</h1>
+                <h1 className="text-4xl md:text-5xl font-bold mb-2 drop-shadow-lg">{restaurant.name}</h1>
                 {restaurant.description && (
                   <p className="text-lg text-white/90">{restaurant.description}</p>
                 )}
@@ -262,7 +262,7 @@ const RestaurantMenu = () => {
                 variant={dietFilter === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDietFilter("all")}
-                className="h-8"
+                className="h-8 transition-all duration-300 hover:scale-105"
               >
                 All
               </Button>
@@ -270,7 +270,7 @@ const RestaurantMenu = () => {
                 variant={dietFilter === "veg" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDietFilter("veg")}
-                className="h-8 gap-2"
+                className="h-8 gap-2 transition-all duration-300 hover:scale-105"
                 style={dietFilter === "veg" ? { backgroundColor: "#16a34a" } : {}}
               >
                 <VegIcon />
@@ -280,7 +280,7 @@ const RestaurantMenu = () => {
                 variant={dietFilter === "non-veg" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDietFilter("non-veg")}
-                className="h-8 gap-2"
+                className="h-8 gap-2 transition-all duration-300 hover:scale-105"
                 style={dietFilter === "non-veg" ? { backgroundColor: "#dc2626" } : {}}
               >
                 <NonVegIcon />
@@ -305,7 +305,7 @@ const RestaurantMenu = () => {
               <SheetTrigger asChild>
                 <Button
                   size="lg"
-                  className="rounded-full h-14 w-14 shadow-lg"
+                  className="rounded-full h-14 w-14 shadow-2xl transition-all duration-300 hover:scale-110 animate-scale-in"
                   style={{ backgroundColor: restaurant.theme_color }}
                 >
                   <MenuIcon className="h-6 w-6" />
@@ -335,10 +335,11 @@ const RestaurantMenu = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {items.map(item => (
+                    {items.map((item, index) => (
                       <Card 
                         key={item.id} 
-                        className="overflow-hidden hover:shadow-lg transition-all cursor-pointer transform hover:scale-[1.02]"
+                        className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-[1.03] hover:-translate-y-1 animate-slide-up group"
+                        style={{ animationDelay: `${index * 0.05}s`, animationFillMode: 'both' }}
                         onClick={() => {
                           setSelectedItem(item);
                           setQuantity(1);
@@ -350,7 +351,7 @@ const RestaurantMenu = () => {
                               <img
                                 src={item.image_url}
                                 alt={item.name}
-                                className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
+                                className="w-24 h-24 rounded-lg object-cover flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
                               />
                             )}
                             <div className="flex-1 min-w-0">
@@ -406,13 +407,13 @@ const RestaurantMenu = () => {
 
       {/* Dish Detail Dialog */}
       <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
-        <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden">
+        <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden animate-scale-in">
           {selectedItem && (
             <div className="relative">
               {/* Close Button */}
               <button
                 onClick={() => setSelectedItem(null)}
-                className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+                className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-300 hover:scale-110 hover:rotate-90"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -423,7 +424,7 @@ const RestaurantMenu = () => {
                   <img
                     src={selectedItem.image_url}
                     alt={selectedItem.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover animate-fade-in"
                   />
                 </div>
               )}
