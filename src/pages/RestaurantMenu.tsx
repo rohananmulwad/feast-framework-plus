@@ -68,6 +68,7 @@ const RestaurantMenu = () => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [dietFilter, setDietFilter] = useState<"all" | "veg" | "non-veg">("all");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   useEffect(() => {
     if (slug) {
       fetchRestaurantData();
@@ -160,7 +161,12 @@ const RestaurantMenu = () => {
     mobile?: boolean;
   }) => <nav className={mobile ? "space-y-2" : "sticky top-24 space-y-2"}>
       <h3 className="font-bold mb-4 text-lg px-2 text-foreground/90">Categories</h3>
-      {categories.map(category => <button key={category.id} onClick={() => scrollToCategory(category.id)} className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 font-medium ${activeCategory === category.id ? "shadow-lg scale-[1.02]" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:scale-[1.01]"}`} style={activeCategory === category.id ? {
+      {categories.map(category => <button key={category.id} onClick={() => {
+        scrollToCategory(category.id);
+        if (mobile) {
+          setMobileMenuOpen(false);
+        }
+      }} className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 font-medium ${activeCategory === category.id ? "shadow-lg scale-[1.02]" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:scale-[1.01]"}`} style={activeCategory === category.id ? {
       backgroundColor: restaurant.theme_color,
       color: "white",
       boxShadow: `0 4px 12px ${restaurant.theme_color}40`
@@ -252,7 +258,7 @@ const RestaurantMenu = () => {
 
           {/* Mobile Menu Button */}
           <div className="lg:hidden fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50">
-            <Sheet>
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button size="lg" className="rounded-full h-14 w-14 sm:h-16 sm:w-16 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 animate-scale-in border-2 border-background" style={{
                 backgroundColor: restaurant.theme_color
