@@ -162,15 +162,15 @@ const RestaurantMenu = () => {
   }) => <nav className={mobile ? "space-y-2" : "sticky top-24 space-y-2"}>
       <h3 className="font-bold mb-4 text-lg px-2 text-foreground/90">Categories</h3>
       {categories.map(category => <button key={category.id} onClick={() => {
-        scrollToCategory(category.id);
-        if (mobile) {
-          setMobileMenuOpen(false);
-        }
-      }} className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 font-medium ${activeCategory === category.id ? "shadow-lg scale-[1.02]" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:scale-[1.01]"}`} style={activeCategory === category.id ? {
+      scrollToCategory(category.id);
+      if (mobile) {
+        setMobileMenuOpen(false);
+      }
+    }} style={activeCategory === category.id ? {
       backgroundColor: restaurant.theme_color,
       color: "white",
       boxShadow: `0 4px 12px ${restaurant.theme_color}40`
-    } : {}}>Cold Coffee{category.name}
+    } : {}} className="">Cold Coffee{category.name}
         </button>)}
     </nav>;
   return <div className="min-h-screen" style={{
