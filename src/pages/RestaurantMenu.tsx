@@ -65,6 +65,7 @@ const RestaurantMenu = () => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [dietFilter, setDietFilter] = useState<"all" | "veg" | "non-veg">("all");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (slug) {
@@ -117,8 +118,11 @@ const RestaurantMenu = () => {
     }
   };
 
-  const scrollToCategory = (categoryId: string) => {
+  const scrollToCategory = (categoryId: string, closeMobile = false) => {
     setActiveCategory(categoryId);
+    if (closeMobile) {
+      setMobileMenuOpen(false);
+    }
     const element = document.getElementById(`category-${categoryId}`);
     if (element) {
       const offset = 100;
@@ -175,7 +179,7 @@ const RestaurantMenu = () => {
       {categories.map(category => (
         <button
           key={category.id}
-          onClick={() => scrollToCategory(category.id)}
+          onClick={() => scrollToCategory(category.id, mobile)}
           className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 font-medium ${
             activeCategory === category.id
               ? "shadow-lg scale-[1.02]"
@@ -315,7 +319,7 @@ const RestaurantMenu = () => {
 
           {/* Mobile Menu Button */}
           <div className="lg:hidden fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50">
-            <Sheet>
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button
                   size="lg"
