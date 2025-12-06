@@ -284,16 +284,16 @@ const RestaurantMenu = () => {
             </div>
 
             {/* Search and Diet Filters */}
-            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-              {/* Search Bar */}
-              <div className="relative w-full sm:w-auto">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Search Bar - compact on mobile */}
+              <div className="relative flex-shrink-0">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Search dishes..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-9 w-full sm:w-48 md:w-56 bg-background/50"
+                  className="pl-7 sm:pl-9 h-8 sm:h-9 w-28 sm:w-40 md:w-48 text-sm bg-background/50"
                 />
               </div>
               
