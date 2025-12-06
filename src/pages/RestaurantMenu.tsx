@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ChefHat, Flame, Menu as MenuIcon, Phone, MapPin, X, Minus, Plus } from "lucide-react";
+import { ChefHat, Flame, Menu as MenuIcon, Phone, MapPin, X, Minus, Plus, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -66,6 +67,7 @@ const RestaurantMenu = () => {
   const [quantity, setQuantity] = useState(1);
   const [dietFilter, setDietFilter] = useState<"all" | "veg" | "non-veg">("all");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (slug) {
@@ -135,6 +137,14 @@ const RestaurantMenu = () => {
   const getCategoryItems = (categoryId: string) => {
     return menuItems.filter(item => {
       if (item.category_id !== categoryId) return false;
+      
+      // Search filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = item.name.toLowerCase().includes(query) || 
+          (item.description?.toLowerCase().includes(query) ?? false);
+        if (!matchesSearch) return false;
+      }
       
       if (dietFilter === "veg") {
         return item.is_vegetarian || item.is_vegan;
@@ -273,37 +283,51 @@ const RestaurantMenu = () => {
               )}
             </div>
 
-            {/* Diet Filters */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-medium mr-1 hidden sm:inline">Filter:</span>
-              <Button
-                variant={dietFilter === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setDietFilter("all")}
-                className="h-9 px-4 transition-all duration-300 hover:scale-105 font-medium"
-              >
-                All
-              </Button>
-              <Button
-                variant={dietFilter === "veg" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setDietFilter("veg")}
-                className="h-9 px-3 sm:px-4 gap-2 transition-all duration-300 hover:scale-105 font-medium"
-                style={dietFilter === "veg" ? { backgroundColor: "#16a34a" } : {}}
-              >
-                <VegIcon />
-                <span className="hidden sm:inline">Veg</span>
-              </Button>
-              <Button
-                variant={dietFilter === "non-veg" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setDietFilter("non-veg")}
-                className="h-9 px-3 sm:px-4 gap-2 transition-all duration-300 hover:scale-105 font-medium"
-                style={dietFilter === "non-veg" ? { backgroundColor: "#dc2626" } : {}}
-              >
-                <NonVegIcon />
-                <span className="hidden sm:inline">Non-Veg</span>
-              </Button>
+            {/* Search and Diet Filters */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              {/* Search Bar */}
+              <div className="relative w-full sm:w-auto">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search dishes..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-9 w-full sm:w-48 md:w-56 bg-background/50"
+                />
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium mr-1 hidden sm:inline">Filter:</span>
+                <Button
+                  variant={dietFilter === "all" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setDietFilter("all")}
+                  className="h-9 px-4 transition-all duration-300 hover:scale-105 font-medium"
+                >
+                  All
+                </Button>
+                <Button
+                  variant={dietFilter === "veg" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setDietFilter("veg")}
+                  className="h-9 px-3 sm:px-4 gap-2 transition-all duration-300 hover:scale-105 font-medium"
+                  style={dietFilter === "veg" ? { backgroundColor: "#16a34a" } : {}}
+                >
+                  <VegIcon />
+                  <span className="hidden sm:inline">Veg</span>
+                </Button>
+                <Button
+                  variant={dietFilter === "non-veg" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setDietFilter("non-veg")}
+                  className="h-9 px-3 sm:px-4 gap-2 transition-all duration-300 hover:scale-105 font-medium"
+                  style={dietFilter === "non-veg" ? { backgroundColor: "#dc2626" } : {}}
+                >
+                  <NonVegIcon />
+                  <span className="hidden sm:inline">Non-Veg</span>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
