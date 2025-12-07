@@ -33,6 +33,17 @@ interface Restaurant {
   banner_image_url: string | null;
   theme_color: string;
   background_color: string;
+  text_color: string;
+  card_color: string;
+  card_text_color: string;
+  price_color: string;
+  category_header_color: string;
+  header_gradient_start: string;
+  header_gradient_end: string;
+  button_color: string;
+  button_text_color: string;
+  border_color: string;
+  font_family: string;
   contact_phone: string | null;
   address: string | null;
 }
@@ -185,7 +196,12 @@ const RestaurantMenu = () => {
 
   const CategoryNav = ({ mobile = false }: { mobile?: boolean }) => (
     <nav className={mobile ? "space-y-2" : "sticky top-24 space-y-2"}>
-      <h3 className="font-bold mb-4 text-lg px-2 text-foreground/90">Categories</h3>
+      <h3 
+        className="font-bold mb-4 text-lg px-2"
+        style={{ color: restaurant.text_color }}
+      >
+        Categories
+      </h3>
       {categories.map(category => (
         <button
           key={category.id}
@@ -193,16 +209,19 @@ const RestaurantMenu = () => {
           className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 font-medium ${
             activeCategory === category.id
               ? "shadow-lg scale-[1.02]"
-              : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:scale-[1.01]"
+              : "hover:scale-[1.01]"
           }`}
           style={
             activeCategory === category.id
               ? { 
-                  backgroundColor: restaurant.theme_color, 
-                  color: "white",
-                  boxShadow: `0 4px 12px ${restaurant.theme_color}40`
+                  backgroundColor: restaurant.button_color || restaurant.theme_color, 
+                  color: restaurant.button_text_color || "white",
+                  boxShadow: `0 4px 12px ${restaurant.button_color || restaurant.theme_color}40`
                 }
-              : {}
+              : {
+                  color: restaurant.text_color,
+                  backgroundColor: 'transparent'
+                }
           }
         >
           {category.name}
@@ -211,8 +230,25 @@ const RestaurantMenu = () => {
     </nav>
   );
 
+  // Generate Google Fonts link
+  const fontLink = restaurant.font_family && restaurant.font_family !== 'Inter' 
+    ? `https://fonts.googleapis.com/css2?family=${restaurant.font_family.replace(' ', '+')}:wght@400;500;600;700&display=swap`
+    : null;
+
   return (
-    <div className="min-h-screen" style={{ backgroundColor: restaurant.background_color }}>
+    <div 
+      className="min-h-screen" 
+      style={{ 
+        backgroundColor: restaurant.background_color,
+        color: restaurant.text_color,
+        fontFamily: `'${restaurant.font_family || 'Inter'}', sans-serif`
+      }}
+    >
+      {/* Dynamic Font Loading */}
+      {fontLink && (
+        <link rel="stylesheet" href={fontLink} />
+      )}
+
       {/* Header Banner */}
       <div className="relative h-56 sm:h-64 md:h-80 lg:h-96 overflow-hidden">
         {restaurant.banner_image_url ? (
@@ -222,12 +258,19 @@ const RestaurantMenu = () => {
               alt={restaurant.name}
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            <div 
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(to top, ${restaurant.header_gradient_end || 'rgba(0,0,0,0.8)'}, ${restaurant.header_gradient_start || 'transparent'})`
+              }}
+            />
           </>
         ) : (
           <div
             className="w-full h-full flex items-center justify-center relative overflow-hidden"
-            style={{ backgroundColor: restaurant.theme_color }}
+            style={{ 
+              background: `linear-gradient(135deg, ${restaurant.theme_color}, ${restaurant.header_gradient_end || restaurant.theme_color})`
+            }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
             <ChefHat className="relative h-24 w-24 sm:h-32 sm:w-32 text-white/20" />
@@ -235,16 +278,20 @@ const RestaurantMenu = () => {
         )}
         
         {/* Restaurant Info Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 text-white animate-slide-up">
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 animate-slide-up" style={{ color: restaurant.button_text_color || '#fff' }}>
           <div className="container max-w-7xl mx-auto">
             <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3 sm:gap-4">
               {restaurant.logo_url && (
                 <div className="relative">
-                  <div className="absolute inset-0 bg-primary/30 blur-xl rounded-full" />
+                  <div 
+                    className="absolute inset-0 blur-xl rounded-full" 
+                    style={{ backgroundColor: `${restaurant.theme_color}50` }}
+                  />
                   <img
                     src={restaurant.logo_url}
                     alt=""
-                    className="relative h-16 w-16 sm:h-20 sm:w-20 rounded-full border-4 border-white shadow-2xl object-cover transition-transform duration-300 hover:scale-110"
+                    className="relative h-16 w-16 sm:h-20 sm:w-20 rounded-full border-4 shadow-2xl object-cover transition-transform duration-300 hover:scale-110"
+                    style={{ borderColor: restaurant.button_text_color || '#fff' }}
                   />
                 </div>
               )}
@@ -253,7 +300,7 @@ const RestaurantMenu = () => {
                   {restaurant.name}
                 </h1>
                 {restaurant.description && (
-                  <p className="text-base sm:text-lg text-white/90 max-w-2xl leading-relaxed">
+                  <p className="text-base sm:text-lg max-w-2xl leading-relaxed" style={{ opacity: 0.9 }}>
                     {restaurant.description}
                   </p>
                 )}
@@ -264,19 +311,31 @@ const RestaurantMenu = () => {
       </div>
 
       {/* Contact Info Bar with Filters */}
-      <div className="border-b border-border/50 bg-card/95 backdrop-blur-lg sticky top-0 z-40 shadow-lg">
+      <div 
+        className="border-b backdrop-blur-lg sticky top-0 z-40 shadow-lg"
+        style={{ 
+          backgroundColor: `${restaurant.card_color || restaurant.background_color}f0`,
+          borderColor: restaurant.border_color
+        }}
+      >
         <div className="container max-w-7xl mx-auto px-4 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             {/* Contact Info */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-sm">
               {restaurant.address && (
-                <div className="flex items-start sm:items-center gap-2 text-muted-foreground">
+                <div 
+                  className="flex items-start sm:items-center gap-2"
+                  style={{ color: restaurant.card_text_color, opacity: 0.8 }}
+                >
                   <MapPin className="h-4 w-4 mt-0.5 sm:mt-0 flex-shrink-0" />
                   <span className="line-clamp-1">{restaurant.address}</span>
                 </div>
               )}
               {restaurant.contact_phone && (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div 
+                  className="flex items-center gap-2"
+                  style={{ color: restaurant.card_text_color, opacity: 0.8 }}
+                >
                   <Phone className="h-4 w-4 flex-shrink-0" />
                   <span>{restaurant.contact_phone}</span>
                 </div>
@@ -287,23 +346,40 @@ const RestaurantMenu = () => {
             <div className="flex items-center gap-2 sm:gap-3">
               {/* Search Bar - compact on mobile */}
               <div className="relative flex-shrink-0">
-                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4" style={{ color: restaurant.card_text_color, opacity: 0.6 }} />
                 <Input
                   type="text"
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-7 sm:pl-9 h-8 sm:h-9 w-28 sm:w-40 md:w-48 text-sm bg-background/50"
+                  className="pl-7 sm:pl-9 h-8 sm:h-9 w-28 sm:w-40 md:w-48 text-sm"
+                  style={{ 
+                    backgroundColor: `${restaurant.background_color}80`,
+                    borderColor: restaurant.border_color,
+                    color: restaurant.card_text_color
+                  }}
                 />
               </div>
               
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium mr-1 hidden sm:inline">Filter:</span>
+                <span 
+                  className="text-sm font-medium mr-1 hidden sm:inline"
+                  style={{ color: restaurant.card_text_color }}
+                >
+                  Filter:
+                </span>
                 <Button
                   variant={dietFilter === "all" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setDietFilter("all")}
                   className="h-9 px-4 transition-all duration-300 hover:scale-105 font-medium"
+                  style={dietFilter === "all" ? { 
+                    backgroundColor: restaurant.button_color || restaurant.theme_color,
+                    color: restaurant.button_text_color
+                  } : {
+                    borderColor: restaurant.border_color,
+                    color: restaurant.card_text_color
+                  }}
                 >
                   All
                 </Button>
@@ -312,7 +388,10 @@ const RestaurantMenu = () => {
                   size="sm"
                   onClick={() => setDietFilter("veg")}
                   className="h-9 px-3 sm:px-4 gap-2 transition-all duration-300 hover:scale-105 font-medium"
-                  style={dietFilter === "veg" ? { backgroundColor: "#16a34a" } : {}}
+                  style={dietFilter === "veg" ? { backgroundColor: "#16a34a", color: "#fff" } : {
+                    borderColor: restaurant.border_color,
+                    color: restaurant.card_text_color
+                  }}
                 >
                   <VegIcon />
                   <span className="hidden sm:inline">Veg</span>
@@ -322,7 +401,10 @@ const RestaurantMenu = () => {
                   size="sm"
                   onClick={() => setDietFilter("non-veg")}
                   className="h-9 px-3 sm:px-4 gap-2 transition-all duration-300 hover:scale-105 font-medium"
-                  style={dietFilter === "non-veg" ? { backgroundColor: "#dc2626" } : {}}
+                  style={dietFilter === "non-veg" ? { backgroundColor: "#dc2626", color: "#fff" } : {
+                    borderColor: restaurant.border_color,
+                    color: restaurant.card_text_color
+                  }}
                 >
                   <NonVegIcon />
                   <span className="hidden sm:inline">Non-Veg</span>
@@ -347,13 +429,24 @@ const RestaurantMenu = () => {
               <SheetTrigger asChild>
                 <Button
                   size="lg"
-                  className="rounded-full h-14 w-14 sm:h-16 sm:w-16 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 animate-scale-in border-2 border-background"
-                  style={{ backgroundColor: restaurant.theme_color }}
+                  className="rounded-full h-14 w-14 sm:h-16 sm:w-16 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 animate-scale-in border-2"
+                  style={{ 
+                    backgroundColor: restaurant.button_color || restaurant.theme_color,
+                    color: restaurant.button_text_color,
+                    borderColor: restaurant.button_text_color
+                  }}
                 >
                   <MenuIcon className="h-6 w-6 sm:h-7 sm:w-7" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[85vw] sm:w-80">
+              <SheetContent 
+                side="left" 
+                className="w-[85vw] sm:w-80"
+                style={{ 
+                  backgroundColor: restaurant.background_color,
+                  borderColor: restaurant.border_color
+                }}
+              >
                 <ScrollArea className="h-full py-6">
                   <CategoryNav mobile />
                 </ScrollArea>
@@ -370,11 +463,16 @@ const RestaurantMenu = () => {
               return (
                 <div key={category.id} id={`category-${category.id}`} className="scroll-mt-24">
                   <div className="mb-6">
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    <h2 
+                      className="text-2xl sm:text-3xl font-bold mb-2"
+                      style={{ color: restaurant.category_header_color || restaurant.theme_color }}
+                    >
                       {category.name}
                     </h2>
                     {category.description && (
-                      <p className="text-muted-foreground leading-relaxed">{category.description}</p>
+                      <p style={{ color: restaurant.text_color, opacity: 0.7 }} className="leading-relaxed">
+                        {category.description}
+                      </p>
                     )}
                   </div>
 
@@ -382,8 +480,13 @@ const RestaurantMenu = () => {
                     {items.map((item, index) => (
                       <Card 
                         key={item.id} 
-                        className="overflow-hidden border-border/50 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 cursor-pointer group bg-gradient-to-br from-card to-card/80 animate-slide-up"
-                        style={{ animationDelay: `${index * 0.03}s`, animationFillMode: 'both' }}
+                        className="overflow-hidden hover:shadow-2xl transition-all duration-500 cursor-pointer group animate-slide-up"
+                        style={{ 
+                          animationDelay: `${index * 0.03}s`, 
+                          animationFillMode: 'both',
+                          backgroundColor: restaurant.card_color,
+                          borderColor: restaurant.border_color
+                        }}
                         onClick={() => {
                           setSelectedItem(item);
                           setQuantity(1);
@@ -411,19 +514,25 @@ const RestaurantMenu = () => {
                                       <NonVegIcon />
                                     )}
                                   </div>
-                                  <h3 className="font-semibold text-base sm:text-lg leading-tight group-hover:text-primary transition-colors duration-300">
+                                  <h3 
+                                    className="font-semibold text-base sm:text-lg leading-tight transition-colors duration-300"
+                                    style={{ color: restaurant.card_text_color }}
+                                  >
                                     {item.name}
                                   </h3>
                                 </div>
                                 <span
                                   className="font-bold text-base sm:text-lg whitespace-nowrap flex-shrink-0"
-                                  style={{ color: restaurant.theme_color }}
+                                  style={{ color: restaurant.price_color || restaurant.theme_color }}
                                 >
                                   ₹{item.price.toFixed(2)}
                                 </span>
                               </div>
                               {item.description && (
-                                <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 line-clamp-2 leading-relaxed">
+                                <p 
+                                  className="text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2 leading-relaxed"
+                                  style={{ color: restaurant.card_text_color, opacity: 0.7 }}
+                                >
                                   {item.description}
                                 </p>
                               )}
@@ -448,11 +557,11 @@ const RestaurantMenu = () => {
             {categories.length === 0 && (
               <div className="text-center py-20 md:py-32">
                 <div className="relative inline-block mb-6">
-                  <div className="absolute inset-0 bg-muted/50 blur-2xl rounded-full" />
-                  <ChefHat className="relative h-16 w-16 md:h-20 md:w-20 mx-auto text-muted-foreground" />
+                  <div className="absolute inset-0 blur-2xl rounded-full" style={{ backgroundColor: `${restaurant.theme_color}30` }} />
+                  <ChefHat className="relative h-16 w-16 md:h-20 md:w-20 mx-auto" style={{ color: restaurant.text_color, opacity: 0.5 }} />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-3">No menu items yet</h2>
-                <p className="text-muted-foreground text-lg">Check back soon!</p>
+                <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: restaurant.text_color }}>No menu items yet</h2>
+                <p style={{ color: restaurant.text_color, opacity: 0.6 }} className="text-lg">Check back soon!</p>
               </div>
             )}
           </div>

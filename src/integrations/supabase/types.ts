@@ -116,15 +116,26 @@ export type Database = {
           address: string | null
           background_color: string | null
           banner_image_url: string | null
+          border_color: string | null
+          button_color: string | null
+          button_text_color: string | null
+          card_color: string | null
+          card_text_color: string | null
+          category_header_color: string | null
           contact_email: string | null
           contact_phone: string | null
           created_at: string | null
           description: string | null
+          font_family: string | null
+          header_gradient_end: string | null
+          header_gradient_start: string | null
           id: string
           is_active: boolean | null
           logo_url: string | null
           name: string
+          price_color: string | null
           slug: string
+          text_color: string | null
           theme_color: string | null
           updated_at: string | null
         }
@@ -132,15 +143,26 @@ export type Database = {
           address?: string | null
           background_color?: string | null
           banner_image_url?: string | null
+          border_color?: string | null
+          button_color?: string | null
+          button_text_color?: string | null
+          card_color?: string | null
+          card_text_color?: string | null
+          category_header_color?: string | null
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string | null
           description?: string | null
+          font_family?: string | null
+          header_gradient_end?: string | null
+          header_gradient_start?: string | null
           id?: string
           is_active?: boolean | null
           logo_url?: string | null
           name: string
+          price_color?: string | null
           slug: string
+          text_color?: string | null
           theme_color?: string | null
           updated_at?: string | null
         }
@@ -148,15 +170,26 @@ export type Database = {
           address?: string | null
           background_color?: string | null
           banner_image_url?: string | null
+          border_color?: string | null
+          button_color?: string | null
+          button_text_color?: string | null
+          card_color?: string | null
+          card_text_color?: string | null
+          category_header_color?: string | null
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string | null
           description?: string | null
+          font_family?: string | null
+          header_gradient_end?: string | null
+          header_gradient_start?: string | null
           id?: string
           is_active?: boolean | null
           logo_url?: string | null
           name?: string
+          price_color?: string | null
           slug?: string
+          text_color?: string | null
           theme_color?: string | null
           updated_at?: string | null
         }
