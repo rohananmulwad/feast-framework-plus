@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Edit2, Trash2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, Edit2, Trash2, Settings, Palette, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import ThemeCustomizer from "./ThemeCustomizer";
 
 interface Restaurant {
   id: string;
@@ -16,6 +18,17 @@ interface Restaurant {
   description: string | null;
   theme_color: string;
   background_color: string;
+  text_color: string;
+  card_color: string;
+  card_text_color: string;
+  price_color: string;
+  category_header_color: string;
+  header_gradient_start: string;
+  header_gradient_end: string;
+  button_color: string;
+  button_text_color: string;
+  border_color: string;
+  font_family: string;
   contact_phone: string | null;
   address: string | null;
   is_active: boolean;
@@ -34,7 +47,18 @@ const RestaurantsAdmin = () => {
     logo_url: "",
     banner_image_url: "",
     theme_color: "#FF6B35",
-    background_color: "#FFF5F0",
+    background_color: "#1a1f2e",
+    text_color: "#FFFFFF",
+    card_color: "#242a38",
+    card_text_color: "#FFFFFF",
+    price_color: "#FF8A4C",
+    category_header_color: "#FF8A4C",
+    header_gradient_start: "#000000",
+    header_gradient_end: "#1a1f2e",
+    button_color: "#FF6B35",
+    button_text_color: "#FFFFFF",
+    border_color: "#2a3441",
+    font_family: "Inter",
     contact_phone: "",
     address: "",
   });
@@ -97,8 +121,19 @@ const RestaurantsAdmin = () => {
       description: restaurant.description || "",
       logo_url: (restaurant as any).logo_url || "",
       banner_image_url: (restaurant as any).banner_image_url || "",
-      theme_color: restaurant.theme_color,
-      background_color: restaurant.background_color,
+      theme_color: restaurant.theme_color || "#FF6B35",
+      background_color: restaurant.background_color || "#1a1f2e",
+      text_color: restaurant.text_color || "#FFFFFF",
+      card_color: restaurant.card_color || "#242a38",
+      card_text_color: restaurant.card_text_color || "#FFFFFF",
+      price_color: restaurant.price_color || "#FF8A4C",
+      category_header_color: restaurant.category_header_color || "#FF8A4C",
+      header_gradient_start: restaurant.header_gradient_start || "#000000",
+      header_gradient_end: restaurant.header_gradient_end || "#1a1f2e",
+      button_color: restaurant.button_color || "#FF6B35",
+      button_text_color: restaurant.button_text_color || "#FFFFFF",
+      border_color: restaurant.border_color || "#2a3441",
+      font_family: restaurant.font_family || "Inter",
       contact_phone: restaurant.contact_phone || "",
       address: restaurant.address || "",
     });
@@ -169,7 +204,18 @@ const RestaurantsAdmin = () => {
       logo_url: "",
       banner_image_url: "",
       theme_color: "#FF6B35",
-      background_color: "#FFF5F0",
+      background_color: "#1a1f2e",
+      text_color: "#FFFFFF",
+      card_color: "#242a38",
+      card_text_color: "#FFFFFF",
+      price_color: "#FF8A4C",
+      category_header_color: "#FF8A4C",
+      header_gradient_start: "#000000",
+      header_gradient_end: "#1a1f2e",
+      button_color: "#FF6B35",
+      button_text_color: "#FFFFFF",
+      border_color: "#2a3441",
+      font_family: "Inter",
       contact_phone: "",
       address: "",
     });
@@ -186,174 +232,159 @@ const RestaurantsAdmin = () => {
               Add Restaurant
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                {editingRestaurant ? <Edit2 className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
                 {editingRestaurant ? "Edit Restaurant" : "Add New Restaurant"}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Restaurant Name *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
+            <form onSubmit={handleSubmit}>
+              <Tabs defaultValue="details" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="details" className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    Details
+                  </TabsTrigger>
+                  <TabsTrigger value="theme" className="flex items-center gap-2">
+                    <Palette className="h-4 w-4" />
+                    Theme & Colors
+                  </TabsTrigger>
+                </TabsList>
 
-              <div className="space-y-2">
-                <Label htmlFor="slug">URL Slug * (e.g., "pizza-palace")</Label>
-                <Input
-                  id="slug"
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="logo_url">Restaurant Logo</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="logo_url"
-                    type="url"
-                    value={formData.logo_url}
-                    onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                    placeholder="https://example.com/logo.jpg"
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => document.getElementById('logo-upload')?.click()}
-                    disabled={uploading}
-                  >
-                    {uploading ? "Uploading..." : "Browse"}
-                  </Button>
-                </div>
-                <Input
-                  id="logo-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileUpload(e, 'logo_url')}
-                  className="hidden"
-                />
-                {formData.logo_url && (
-                  <img 
-                    src={formData.logo_url} 
-                    alt="Logo preview" 
-                    className="w-24 h-24 object-cover rounded-full border-2"
-                  />
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="banner_image_url">Banner Image</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="banner_image_url"
-                    type="url"
-                    value={formData.banner_image_url}
-                    onChange={(e) => setFormData({ ...formData, banner_image_url: e.target.value })}
-                    placeholder="https://example.com/banner.jpg"
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => document.getElementById('banner-upload')?.click()}
-                    disabled={uploading}
-                  >
-                    {uploading ? "Uploading..." : "Browse"}
-                  </Button>
-                </div>
-                <Input
-                  id="banner-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileUpload(e, 'banner_image_url')}
-                  className="hidden"
-                />
-                {formData.banner_image_url && (
-                  <img 
-                    src={formData.banner_image_url} 
-                    alt="Banner preview" 
-                    className="w-full h-32 object-cover rounded-md"
-                  />
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="theme_color">Theme Color</Label>
-                  <div className="flex gap-2">
+                <TabsContent value="details" className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Restaurant Name *</Label>
                     <Input
-                      id="theme_color"
-                      type="color"
-                      value={formData.theme_color}
-                      onChange={(e) => setFormData({ ...formData, theme_color: e.target.value })}
-                      className="w-20 h-10"
-                    />
-                    <Input
-                      value={formData.theme_color}
-                      onChange={(e) => setFormData({ ...formData, theme_color: e.target.value })}
-                      placeholder="#FF6B35"
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
                     />
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="background_color">Background Color</Label>
-                  <div className="flex gap-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="slug">URL Slug * (e.g., "pizza-palace")</Label>
                     <Input
-                      id="background_color"
-                      type="color"
-                      value={formData.background_color}
-                      onChange={(e) => setFormData({ ...formData, background_color: e.target.value })}
-                      className="w-20 h-10"
-                    />
-                    <Input
-                      value={formData.background_color}
-                      onChange={(e) => setFormData({ ...formData, background_color: e.target.value })}
-                      placeholder="#FFF5F0"
+                      id="slug"
+                      value={formData.slug}
+                      onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                      required
                     />
                   </div>
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="contact_phone">Contact Phone</Label>
-                <Input
-                  id="contact_phone"
-                  type="tel"
-                  value={formData.contact_phone}
-                  onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={3}
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Textarea
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  rows={2}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="logo_url">Restaurant Logo</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="logo_url"
+                        type="url"
+                        value={formData.logo_url}
+                        onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+                        placeholder="https://example.com/logo.jpg"
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('logo-upload')?.click()}
+                        disabled={uploading}
+                      >
+                        {uploading ? "Uploading..." : "Browse"}
+                      </Button>
+                    </div>
+                    <Input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(e, 'logo_url')}
+                      className="hidden"
+                    />
+                    {formData.logo_url && (
+                      <img 
+                        src={formData.logo_url} 
+                        alt="Logo preview" 
+                        className="w-24 h-24 object-cover rounded-full border-2"
+                      />
+                    )}
+                  </div>
 
-              <div className="flex gap-2 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="banner_image_url">Banner Image</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="banner_image_url"
+                        type="url"
+                        value={formData.banner_image_url}
+                        onChange={(e) => setFormData({ ...formData, banner_image_url: e.target.value })}
+                        placeholder="https://example.com/banner.jpg"
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('banner-upload')?.click()}
+                        disabled={uploading}
+                      >
+                        {uploading ? "Uploading..." : "Browse"}
+                      </Button>
+                    </div>
+                    <Input
+                      id="banner-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(e, 'banner_image_url')}
+                      className="hidden"
+                    />
+                    {formData.banner_image_url && (
+                      <img 
+                        src={formData.banner_image_url} 
+                        alt="Banner preview" 
+                        className="w-full h-32 object-cover rounded-md"
+                      />
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="contact_phone">Contact Phone</Label>
+                    <Input
+                      id="contact_phone"
+                      type="tel"
+                      value={formData.contact_phone}
+                      onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Textarea
+                      id="address"
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      rows={2}
+                    />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="theme">
+                  <ThemeCustomizer
+                    formData={formData}
+                    onChange={(changes) => setFormData({ ...formData, ...changes })}
+                  />
+                </TabsContent>
+              </Tabs>
+
+              <div className="flex gap-2 pt-6 border-t mt-6">
                 <Button type="submit" className="flex-1">
                   {editingRestaurant ? "Update" : "Create"} Restaurant
                 </Button>
@@ -371,22 +402,55 @@ const RestaurantsAdmin = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {restaurants.map((restaurant) => (
-            <Card key={restaurant.id}>
+            <Card key={restaurant.id} className="overflow-hidden group hover:shadow-xl transition-all duration-300">
               <CardHeader
-                className="pb-3"
-                style={{ backgroundColor: restaurant.theme_color, color: "white" }}
+                className="pb-3 relative"
+                style={{ 
+                  background: `linear-gradient(135deg, ${restaurant.theme_color}, ${restaurant.theme_color}dd)`,
+                  color: "white" 
+                }}
               >
-                <CardTitle className="text-lg">{restaurant.name}</CardTitle>
+                <CardTitle className="text-lg flex items-center justify-between">
+                  {restaurant.name}
+                  <a 
+                    href={`/menu/${restaurant.slug}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="space-y-2 text-sm">
-                  <p className="text-muted-foreground">Slug: /{restaurant.slug}</p>
+                  <p className="text-muted-foreground font-mono text-xs">/{restaurant.slug}</p>
                   {restaurant.description && (
                     <p className="line-clamp-2">{restaurant.description}</p>
                   )}
-                  {restaurant.contact_phone && (
-                    <p className="text-muted-foreground">📞 {restaurant.contact_phone}</p>
-                  )}
+                  {/* Color Preview */}
+                  <div className="flex gap-1 mt-3">
+                    <div 
+                      className="w-6 h-6 rounded-full border-2 border-border" 
+                      style={{ backgroundColor: restaurant.theme_color }}
+                      title="Theme"
+                    />
+                    <div 
+                      className="w-6 h-6 rounded-full border-2 border-border" 
+                      style={{ backgroundColor: restaurant.background_color }}
+                      title="Background"
+                    />
+                    <div 
+                      className="w-6 h-6 rounded-full border-2 border-border" 
+                      style={{ backgroundColor: restaurant.card_color || '#242a38' }}
+                      title="Card"
+                    />
+                    <div 
+                      className="w-6 h-6 rounded-full border-2 border-border" 
+                      style={{ backgroundColor: restaurant.price_color || '#FF8A4C' }}
+                      title="Price"
+                    />
+                  </div>
                 </div>
                 <div className="flex gap-2 mt-4">
                   <Button
